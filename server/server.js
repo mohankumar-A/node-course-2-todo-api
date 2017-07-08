@@ -8,6 +8,8 @@ var {User} = require("./models/user");
 
 var app = express();
 
+var port = process.env.port || 3000;
+
 app.use(bodyParser.json());
 
 app.post("/todos", (req, res)=>{
@@ -51,9 +53,27 @@ app.get("/todos/:id", (req, res) => {
     });
 });
 
+app.delete("/todos/:id", (req, res) => {
 
-app.listen(3000, () => {
-   console.log("server is on port 3000");
+    var id = req.params.id;
+
+    if(!ObjecctID.isValid(id)){
+        return res.status(404).send();
+    }
+
+    Todo.findIdAndRemove(id).then((todo) => {
+        if(!todo){
+            return res.status(404).send();
+        }
+        res.send(todo);
+    }).catch((e) => {
+        res.status(400).send();
+    });
+});
+
+
+app.listen(port, () => {
+   console.log(`server is on port ${port}`);
 });
 
 
