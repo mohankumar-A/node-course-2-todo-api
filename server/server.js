@@ -120,6 +120,19 @@ app.post("/users", (req, res) => {
 
 });
 
+app.get("/users/me", (req, res) => {
+    var token =req.header('x-auth');
+
+    User.findByToken(token).then((user) =>{
+        if(!user){
+            return res.status(404).send();
+        }
+        res.send(user);
+    }).catch((err) => {
+        res.status(400).send(err);
+    });
+});
+
 app.listen(port, () => {
    console.log(`server is on port ${port}`);
 });
