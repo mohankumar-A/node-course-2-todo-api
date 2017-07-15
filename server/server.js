@@ -4,19 +4,20 @@ const bodyParser = require("body-parser");
 const _ = require("lodash");
 const {ObjectID} = require("mongodb");
 
-var {mongoose} = require("./db/mongoose");
-var {Todo} = require("./models/todo");
-var {User} = require("./models/user");
+let {authenticate} = require("./authenticate/authenticate");
+let {mongoose} = require("./db/mongoose");
+let {Todo} = require("./models/todo");
+let {User} = require("./models/user");
 
-var app = express();
+let app = express();
 
-var port = process.env.port;
+let port = process.env.port;
 
 app.use(bodyParser.json());
 
 app.post("/todos", (req, res)=>{
     //console.log(req.body);
-    var todo = new Todo({
+    let todo = new Todo({
         text: req.body.text
     });
 
@@ -120,17 +121,8 @@ app.post("/users", (req, res) => {
 
 });
 
-app.get("/users/me", (req, res) => {
-    var token =req.header('x-auth');
-
-    User.findByToken(token).then((user) =>{
-        if(!user){
-            return res.status(404).send();
-        }
-        res.send(user);
-    }).catch((err) => {
-        res.status(400).send(err);
-    });
+app.get("/users/me", authenticate, (req, res) => {
+    res.send(req.user);
 });
 
 app.listen(port, () => {
